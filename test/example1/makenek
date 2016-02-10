@@ -30,9 +30,11 @@ CC="cc"
 
 # linking flags
 #USR_LFLAGS="-L/usr/lib -lfoo"
+USR_LFLAGS="/afs/pdc.kth.se/home/i/ilyai/GPI2/include/GASPI.f90 -L/afs/pdc.kth.se/home/i/ilyai/GPI2/lib64 -lpmi -lugni -lrca -lGPI2"
 
 # generic compiler flags
 #G="-g"
+G="-I/afs/pdc.kth.se/home/i/ilyai/GPI2/include"
 
 # optimization flags
 #OPT_FLAGS_STD=""

@@ -10,7 +10,7 @@ c        d    = derivative matrix
 c        z    = GLL points
 
       real a(0:n,0:n),b(0:n),c(0:n,0:n),d(0:n,0:n),z(0:n)
-      real w(0:2*n)
+      real w(0:20000000)
  
       np = n+1
  

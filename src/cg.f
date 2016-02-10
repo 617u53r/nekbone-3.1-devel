@@ -1,6 +1,7 @@
 c-----------------------------------------------------------------------
       subroutine cg(x,f,g,c,r,w,p,z,n,niter,flop_cg)
       include 'SIZE'
+      include 'mpif.h'
 
 c     Solve Ax=f where A is SPD and is invoked by ax()
 c
@@ -40,6 +41,7 @@ c     set machine tolerances
       call maskit (r,cmask,nx1,ny1,nz1) ! Zero out Dirichlet conditions
 
       rnorm = sqrt(glsc3(r,c,r,n))
+
       iter = 0
       if (nid.eq.0)  write(6,6) iter,rnorm
 

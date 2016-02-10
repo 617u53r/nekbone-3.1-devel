@@ -11,6 +11,8 @@
 #include "gs_local.h"
 #include "comm.h"
 
+#include "/afs/pdc.kth.se/home/i/ilyai/GPI2/include/GASPI.h"
+
 uint comm_gbl_id=0, comm_gbl_np=1;
 
 GS_DEFINE_IDENTITIES()
@@ -104,6 +106,61 @@ void comm_scan(void *scan, const struct comm *com, gs_dom dom, gs_op op,
   scan_imp(scan, com,dom,op, v,vn, buffer);
 }
 
+void comm_allreduce1(gs_dom dom, gs_op op,
+                          void *v, uint vn, void *buf)
+{
+  if(vn==0) return;
+  gaspi_datatype_t gaspitype;
+  gaspi_operation_t gaspiop;
+  gaspi_rank_t iproc, nprocs;
+  gaspi_return_t returnFlag;
+  gaspi_group_t gaspi_group_com;
+
+  gaspi_proc_rank(&iproc);
+  gaspi_proc_num(&nprocs);
+
+    #define DOMAIN_SWITCH() do { \
+      switch(dom) { case gs_double:    gaspitype=GASPI_TYPE_DOUBLE;    break; \
+                    case gs_float:     gaspitype=GASPI_TYPE_FLOAT;     break; \
+                    case gs_int:       gaspitype=GASPI_TYPE_INT;       break; \
+                    case gs_long:      gaspitype=GASPI_TYPE_LONG;      break; \
+      } \
+    } while(0)
+    DOMAIN_SWITCH();
+    #undef DOMAIN_SWITCH
+    switch(op) { case gs_add: gaspiop=GASPI_OP_SUM;  break;
+                 case gs_min: gaspiop=GASPI_OP_MIN;  break;
+                 case gs_max: gaspiop=GASPI_OP_MAX;  break;
+    }
+
+    printf("Enter GASPI zone, proc %i\n", iproc);
+    if ((iproc == 0) || (iproc == 1))                                           
+      {
+	returnFlag =  gaspi_group_create(&gaspi_group_com);
+	if(returnFlag!=GASPI_SUCCESS) printf("Group Create failed, proc %i, %d\n", iproc, returnFlag);
+	if(returnFlag == GASPI_SUCCESS) printf("Group Create successed, proc %i\n", iproc);
+	
+	returnFlag = gaspi_group_add(gaspi_group_com, 0);
+	if(returnFlag!=GASPI_SUCCESS) printf("Group Add failed, proc %i, %d\n", iproc, returnFlag);
+	if(returnFlag == GASPI_SUCCESS) printf("Group Add 0 successed, proc %i\n", iproc);
+	
+	returnFlag = gaspi_group_add(gaspi_group_com, 1);                       
+	if(returnFlag!=GASPI_SUCCESS) printf("Group Add failed, proc %i, %d\n", iproc, returnFlag);
+	if(returnFlag == GASPI_SUCCESS) printf("Group Add 1 successed, proc %i\n", iproc);
+
+	returnFlag = gaspi_group_commit(gaspi_group_com, GASPI_BLOCK);
+	if(returnFlag!=GASPI_SUCCESS) printf("Group Commit failed, proc %i, %d\n", iproc, returnFlag);
+	if(returnFlag == GASPI_SUCCESS) printf("Group Commit successed, proc %i\n", iproc);
+
+	gaspi_allreduce(v,buf,vn,gaspiop,gaspitype,GASPI_GROUP_ALL, GASPI_BLOCK);
+	//gaspi_allreduce(v,buf,vn,gaspiop,gaspitype,gaspi_group_com, GASPI_BLOCK);
+	gaspi_barrier(gaspi_group_com, GASPI_BLOCK);
+      }
+    memcpy(v,buf,vn*gs_dom_size[dom]);
+    //    gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK);
+    return;
+}
+
 void comm_allreduce(const struct comm *com, gs_dom dom, gs_op op,
                           void *v, uint vn, void *buf)
 {
@@ -139,6 +196,9 @@ comm_allreduce_byhand:
   allreduce_imp(com,dom,op, v,vn, buf);
 #endif
 }
+
+
+
 
 double comm_dot(const struct comm *comm, double *v, double *w, uint n)
 {

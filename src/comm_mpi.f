@@ -1,5 +1,7 @@
 c-----------------------------------------------------------------------
       subroutine iniproc(intracomm)
+      use, intrinsic :: ISO_C_BINDING
+      include 'GASPI'
       include 'SIZE'
       include 'PARALLEL'
       include 'mpif.h'
@@ -93,6 +95,111 @@ c
       end
 c-----------------------------------------------------------------------
       subroutine gop( x, w, op, n)
+c
+c     Global vector commutative operation
+c
+      use, intrinsic :: ISO_C_BINDING
+      include 'GASPI'
+      include 'mpif.h'
+c
+      common /nekmpi/ nid,np,nekcomm,nekgroup,nekreal
+
+      real x(n), w(n)
+      character*3 op
+      integer(gaspi_return_t) :: ret
+      type(c_ptr) :: cptr1, cptr2
+      cptr1 = c_loc(x(1));
+      cptr2 = c_loc(w(1));
+
+c
+      call adelay
+      call mpi_barrier(nekcomm,ierr)
+      if (op.eq.'+  ') then
+         ret = gaspi_allreduce(cptr1,cptr2,n,GASPI_OP_SUM,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      elseif (op.EQ.'M  ') then
+         ret = gaspi_allreduce (cptr1,cptr2,n,GASPI_OP_MAX,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      elseif (op.EQ.'m  ') then
+         ret = gaspi_allreduce (cptr1,cptr2,n,GASPI_OP_MIN,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      ret = gaspi_barrier(GASPI_GROUP_ALL,GASPI_BLOCK);
+      else
+         write(6,*) nid,' OP ',op,' not supported.  ABORT in GOP.'
+         call exitt
+      endif
+      call copy(x,w,n)
+
+      return
+      end
+c-----------------------------------------------------------------------
+      subroutine igop1( x, w, op, n)
+c
+c     Global vector commutative operation
+c
+      use, intrinsic :: ISO_C_BINDING
+      include 'GASPI'
+
+      integer x(n), w(n)
+      character*3 op
+      integer(gaspi_return_t) :: ret
+      type(c_ptr) :: cptr1, cptr2
+      cptr1 = c_loc(x(1));
+      cptr2 = c_loc(w(1));
+
+      call adelay
+      if     (op.eq.'+  ') then
+         ret = gaspi_allreduce(cptr1,cptr2,n,GASPI_OP_SUM,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      elseif (op.EQ.'M  ') then
+         ret = gaspi_allreduce (cptr1,cptr2,n,GASPI_OP_MAX,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      elseif (op.EQ.'m  ') then
+         ret = gaspi_allreduce (cptr1,cptr2,n,GASPI_OP_MIN,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      else
+        write(6,*) nid,' OP ',op,' not supported.  ABORT in igop.'
+        call exitt
+      endif
+      call icopy(x,w,n)
+
+      return
+      end
+c-----------------------------------------------------------------------
+      subroutine i8gop1( x, w, op, n)
+c
+c     Global vector commutative operation
+c
+      use, intrinsic :: ISO_C_BINDING
+      include 'GASPI'
+
+      integer*8 x(n), w(n)
+      character*3 op
+      integer(gaspi_return_t) :: ret
+      type(c_ptr) :: cptr1, cptr2
+      cptr1 = c_loc(x(1));
+      cptr2 = c_loc(w(1));
+
+      call adelay
+      if     (op.eq.'+  ') then
+         ret = gaspi_allreduce(cptr1,cptr2,n,GASPI_OP_SUM,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      elseif (op.EQ.'M  ') then
+         ret = gaspi_allreduce (cptr1,cptr2,n,GASPI_OP_MAX,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      elseif (op.EQ.'m  ') then
+         ret = gaspi_allreduce (cptr1,cptr2,n,GASPI_OP_MIN,
+     &     GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK)
+      else
+        write(6,*) nid,' OP ',op,' not supported.  ABORT in igop.'
+        call exitt
+      endif
+      call i8copy(x,w,n)
+
+      return
+      end
+c-----------------------------------------------------------------------
+      subroutine gop1( x, w, op, n)
 c
 c     Global vector commutative operation
 c
@@ -476,7 +583,7 @@ c-----------------------------------------------------------------------
       real*4 papi_mflops
       integer*8 papi_flops
 c
-      call nekgsync()
+c     call nekgsync()
 
 #ifdef PAPI
       call nek_flops(papi_flops,papi_mflops)

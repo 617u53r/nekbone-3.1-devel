@@ -8,7 +8,7 @@
 #include "fail.h"
 #include "types.h"
 
-#include "/afs/pdc.kth.se/home/i/ilyai/GPI2/include/GASPI.h"
+#include "/pdc/vol/gpi2/1.1.2/include/GASPI.h"
 
 #define gs_op gs_op_t   /* fix conflict with fortran */
 
@@ -871,26 +871,188 @@ struct allreduce_data {
   uint buffer_size;
 };
 
-static void allreduce_exec(void *data, gs_mode mode, unsigned vn, gs_dom dom, gs_op op, unsigned transpose, const void *execdata, const struct comm *comm, char *buf)
-
+/*static void allreduce_exec(
+  void *data, gs_mode mode, unsigned vn, gs_dom dom, gs_op op,
+  unsigned transpose, const void *execdata, const struct comm *comm, char *buf)
 {
+    gaspi_datatype_t gaspitype;
+    gaspi_operation_t gaspiop;
+    gaspi_rank_t iproc, nprocs;
+    printf("--------\n");
+    gaspi_proc_rank(&iproc);
+    gaspi_proc_num(&nprocs);
+
   const struct allreduce_data *ard = execdata;
-  static gs_scatter_fun *const scatter_to_buf[] = { &gs_scatter, &gs_scatter_vec, &gs_scatter_many_to_vec, &scatter_noop };
-  static gs_scatter_fun *const scatter_from_buf[] = { &gs_scatter, &gs_scatter_vec, &gs_scatter_vec_to_many, &scatter_noop };
+  static gs_scatter_fun *const scatter_to_buf[] =
+    { &gs_scatter, &gs_scatter_vec, &gs_scatter_many_to_vec, &scatter_noop };
+  static gs_scatter_fun *const scatter_from_buf[] =
+    { &gs_scatter, &gs_scatter_vec, &gs_scatter_vec_to_many, &scatter_noop };
   uint gvn = vn*(ard->buffer_size/2);
   unsigned unit_size = gs_dom_size[dom];
   char *ardbuf;
   ardbuf = buf+unit_size*gvn;
+  /* user array -> buffer */
+/* gs_init_array(buf,gvn,dom,op);
+   scatter_to_buf[mode](buf,data,vn,ard->map_to_buf[transpose],dom);*/
+  /* all reduce */
+  //comm_barrier(comm);
+/*  comm_allreduce1(comm,dom,op, buf,gvn, ardbuf);*/
+  /*
+#define DOMAIN_SWITCH() do { \
+      switch(dom) { case gs_double:    gaspitype=GASPI_TYPE_DOUBLE;    break; \
+  case gs_float:     gaspitype=GASPI_TYPE_FLOAT;     break; \
+  case gs_int:       gaspitype=GASPI_TYPE_INT;       break; \
+  case gs_long:      gaspitype=GASPI_TYPE_LONG;      break; \
+      } \
+    } while(0)
+    DOMAIN_SWITCH();
+    #undef DOMAIN_SWITCH
+    switch(op) { case gs_add: gaspiop=GASPI_OP_SUM;  break;
+    case gs_min: gaspiop=GASPI_OP_MIN;  break;
+    case gs_max: gaspiop=GASPI_OP_MAX;  break;
+    }
+    gaspi_allreduce(buf,ardbuf,gvn,gaspiop,gaspitype,GASPI_GROUP_ALL, GASPI_BLOCK);
+    memcpy(buf,ardbuf,gvn*gs_dom_size[dom]);
+  */
+  /* buffer -> user array */
+  /*scatter_from_buf[mode](data,buf,vn,ard->map_from_buf[transpose],dom);
+}
+*/
 
+static void allreduce_exec(
+			   void *data, gs_mode mode, unsigned vn, gs_dom dom, gs_op op,
+			   unsigned transpose, const void *execdata, const struct comm *comm, char *buf)
+{
+  int gaspi_com_rank;
+  gaspi_group_t gaspi_group_com;
+  gaspi_rank_t iProc;
+  const struct allreduce_data *ard = execdata;
+  static gs_scatter_fun *const scatter_to_buf[] =
+    { &gs_scatter, &gs_scatter_vec, &gs_scatter_many_to_vec, &scatter_noop };
+  static gs_scatter_fun *const scatter_from_buf[] =
+    { &gs_scatter, &gs_scatter_vec, &gs_scatter_vec_to_many, &scatter_noop };
+  uint gvn = vn*(ard->buffer_size/2);
+  unsigned unit_size = gs_dom_size[dom];
+  char *ardbuf;
+  ardbuf = buf+unit_size*gvn;
   /* user array -> buffer */
   gs_init_array(buf,gvn,dom,op);
   scatter_to_buf[mode](buf,data,vn,ard->map_to_buf[transpose],dom);
   /* all reduce */
-  comm_allreduce(comm,dom,op, buf,gvn, ardbuf);
-  /* buffer -> user array */
-  scatter_from_buf[mode](data,buf,vn,ard->map_from_buf[transpose],dom);
+  //   comm_allreduce(comm,dom,op, buf,gvn, ardbuf);                                                      
+  //  MPI_Comm_rank(comm->c, &gaspi_com_rank);                                                           
+  comm_barrier(comm);
+  gaspi_proc_rank(&iProc);
+  //printf("\n iProc = %i \n", iProc);
+  //  printf("Enter Create");
+  gaspi_return_t returnFlag;
+  gaspi_timeout_t timeout = 1000;
 
+    returnFlag =  gaspi_group_create(&gaspi_group_com);
+    if(returnFlag!=GASPI_SUCCESS)printf("\nGroup Create failed %d\n", returnFlag);
+    // printf("\n!!!!!! gaspi group create !!!!!!!\n");
+
+    // if(iProc == 0){
+      returnFlag = gaspi_group_add(gaspi_group_com, 0);
+      if(returnFlag!=GASPI_SUCCESS)printf("\nGroup Add failed %d\n", returnFlag);
+      if(returnFlag == GASPI_SUCCESS) printf("\nAdd 0 to group \n");
+      //  printf("\n!!!!!! gaspi group add 0 proc to group !!!!!!!\n");
+	//}
+	// if(iProc == 4){
+      returnFlag = gaspi_group_add(gaspi_group_com, 3);
+      if(returnFlag!=GASPI_SUCCESS)printf("\nGroup Add 2 failed %d\n", returnFlag);
+      if(returnFlag == GASPI_SUCCESS) printf("\nAdd 3 to group \n");
+      //printf("\n!!!!!! gaspi group add 1 proc to group!!!!!!!\n");
+	//}
+      	if( (iProc == 0) || (iProc == 3)){
+	  returnFlag = gaspi_group_commit(gaspi_group_com, GASPI_BLOCK);
+	  if(returnFlag == GASPI_TIMEOUT) printf("\n commit timeout\n");
+	  if(returnFlag!=GASPI_SUCCESS)printf("\nGroup Commit failed %d\n", returnFlag);
+	  if(returnFlag == GASPI_SUCCESS) printf("\n Group COMMITED!!!\n");
+	  //  printf("\n!!!!!! gaspi group commit !!!!!!!\n");
+       	}
+	  /*Segment*/
+
+	  gaspi_segment_id_t segment;
+	  
+	  /*gaspi_size_t group_size;
+	  gaspi_rank_t group_sz;
+	  
+	  gaspi_group_size(gaspi_group_com, &group_sz);
+	  printf("\n group_size - %i\n", group_sz);
+	  gaspi_rank_t group_ranks[group_sz];
+
+	  gaspi_group_ranks(gaspi_group_com, group_ranks);
+	  
+	  int i;
+	  */
+	  /* process id in new group is not corresponded to old group!!!*/
+	  /* for(i = 0; i< group_sz; i++)
+	    printf("\n rank[%i] = %i\n", i, group_ranks[i]);
+
+
+	  for(i = 0; i < group_sz; i++){
+	    if(group_ranks[i] == iProc){
+	     returnFlag =  gaspi_segment_create(segment, gvn, gaspi_group_com, GASPI_BLOCK, GASPI_ALLOC_DEFAULT);
+	     if(returnFlag != GASPI_SUCCESS) printf("\nSegment failed - %d\n",returnFlag);
+	     if(returnFlag == GASPI_SUCCESS) printf("\nSegment created\n");
+	    }
+	  }
+	  */
+	  gaspi_rank_t group_ranks[2];                                       
+          gaspi_group_ranks(gaspi_group_com, group_ranks);
+	  printf("\n group_ranks[0] = %d\n",group_ranks[0]);
+	  printf("\n group_ranks[1] = %d\n",group_ranks[1]);
+
+	  if((iProc==0) || (iProc == 3)) {
+	    returnFlag =  gaspi_segment_create(segment, sizeof(double)*gvn, gaspi_group_com, GASPI_BLOCK, GASPI_ALLOC_DEFAULT);
+	    if(returnFlag != GASPI_SUCCESS) printf("\nSegment failed - %d\n",returnFlag);
+	    if(returnFlag == GASPI_SUCCESS) printf("\nSegment created\n");
+	  }
+
+	  /* while(gaspi_barrier(gaspi_group_com, GASPI_TEST) != GASPI_SUCCESS){
+	    //gaspi_state_vec_get(&state_vector);
+	    // printf("\n gaspi_barrier \n");
+	    }*/
+
+
+
+	  /*Segment*/	
+	  
+	  
+
+	  
+	if((iProc==0) || (iProc == 3)) {
+	returnFlag = gaspi_allreduce((gaspi_pointer_t)buf,(gaspi_pointer_t)ardbuf,(gaspi_number_t)gvn,GASPI_OP_SUM,GASPI_TYPE_DOUBLE,gaspi_group_com,timeout);
+	if (returnFlag == GASPI_TIMEOUT) printf("\n TIMEOUT \n");
+	  if(returnFlag != GASPI_SUCCESS) printf("\nproblem with allreduce\n");
+	  if(returnFlag == GASPI_SUCCESS) printf("\n allreduce done!!!\n");
+	}      
+	  
+	if((iProc==0) || (iProc == 3)) {
+	  gaspi_segment_delete(segment);
+	  gaspi_group_delete(gaspi_group_com);
+	}
+
+
+	
+	//gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK);
+       
+	// memcpy(buf,ardbuf,gvn*gs_dom_size[dom]);
+
+  /* buffer -> user array */
+	/*  scatter_from_buf[mode](data,buf,vn,ard->map_from_buf[transpose],dom);
+  gaspi_barrier(gaspi_group_com, GASPI_BLOCK);
+  returnFlag = gaspi_group_delete(gaspi_group_com);
+  if(returnFlag != GASPI_SUCCESS) printf("\ngroup not deleted\n");
+  else printf("\n group deleted\n");
+	*/
+	  
+
+	  
+	// scatter_from_buf[mode](data,buf,vn,ard->map_from_buf[transpose],dom);
 }
+
 
 /*------------------------------------------------------------------------------
   All-reduce setup
@@ -960,13 +1122,19 @@ static void dry_run_time(double times[3], const struct gs_remote *r,
                          const struct comm *comm, buffer *buf)
 {
   int i; double t;
+  //  printf ("dry run time\n");
   buffer_reserve(buf,gs_dom_size[gs_double]*r->buffer_size);
-     // for(i= 2;i;--i)
-  //    r->exec(0,mode_dry_run,1,gs_double,gs_add,0,r->data,comm,buf->ptr);
+  //printf ("buf res\n");
+  for(i= 2;i;--i)
+    { //   printf ("%i\n", i);
+      r->exec(0,mode_dry_run,1,gs_double,gs_add,0,r->data,comm,buf->ptr);}
+  // printf ("for loop ends\n");
+  // printf ("comm barrier\n");
   comm_barrier(comm);
+  // printf ("commbar ends\n");
   t = comm_time();
-     //for(i=10;i;--i)
-  //r->exec(0,mode_dry_run,1,gs_double,gs_add,0,r->data,comm,buf->ptr);
+  for(i=10;i;--i)
+    r->exec(0,mode_dry_run,1,gs_double,gs_add,0,r->data,comm,buf->ptr);
   t = (comm_time() - t)/10;
   times[0] = t/comm->np, times[1] = t, times[2] = t;
   comm_allreduce(comm,gs_double,gs_add, &times[0],1, &t);
@@ -977,13 +1145,10 @@ static void dry_run_time(double times[3], const struct gs_remote *r,
 static void auto_setup(struct gs_remote *r, struct gs_topology *top,
                        const struct comm *comm, buffer *buf)
 {
-  //  pw_setup(r, top,comm,buf);
-  allreduce_setup(r, top,comm,buf);
+  pw_setup(r, top,comm,buf);
   
   if(comm->np>1) {
-    //    const char *name = "pairwise";
-    const char *name = "allreduce";
-
+    const char *name = "pairwise";
     struct gs_remote r_alt;
     double time[2][3];
 
@@ -1003,21 +1168,19 @@ static void auto_setup(struct gs_remote *r, struct gs_topology *top,
         r_alt.fin(r_alt.data); \
     } while(0)
 
-    //    DRY_RUN(0, r, "pairwise times (avg, min, max)");
-    DRY_RUN(0, r, "allreduce times (avg, min, max)");
-
-    /*
+    DRY_RUN(0, r, "pairwise times (avg, min, max)");
     cr_setup(&r_alt, top,comm,buf);
     DRY_RUN_CHECK(      "crystal router                ", "crystal router");
       if(top->total_shared<100000) {
-	comm_barrier(comm);
       allreduce_setup(&r_alt, top,comm,buf);
       DRY_RUN_CHECK(    "all reduce                    ", "allreduce");
     }
-    */
+      printf ("lalala\n");
+
     #undef DRY_RUN_CHECK
     #undef DRY_RUN
     if(comm->id==0) printf("   used all_to_all method: %s\n",name);
+      printf ("lololo\n");
   }
 }
 

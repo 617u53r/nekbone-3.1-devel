@@ -1,11 +1,11 @@
 c-----------------------------------------------------------------------
       program nekbone
-      
+      use, intrinsic :: ISO_C_BINDING      
+      include 'GASPI'
       include 'SIZE'
       include 'TOTAL'
       include 'SEMHAT'
       include 'mpif.h'
-
       common /mymask/cmask(-1:lx1*ly1*lz1*lelt)
       parameter (lxyz = lx1*ly1*lz1)
       parameter (lt=lxyz*lelt)
@@ -21,12 +21,32 @@ c-----------------------------------------------------------------------
       integer npx,npy,npz      ! processor decomp
       integer mx ,my ,mz       ! element decomp
 
+      integer(gaspi_return_t) :: retinit, retterm, retcommit, gpiiproc,
+     $gpinprocs
+      integer(gaspi_rank_t) :: iproc, nprocs
 
       call iniproc(mpi_comm_world)    ! has nekmpi common block
       call init_delay
 
       call read_param(ifbrick,iel0,ielN,ielD,nx0,nxN,nxD,
      $                               npx,npy,npz,mx,my,mz)
+
+c     =============================================================
+
+      retinit = gaspi_proc_init(GASPI_BLOCK)
+      if(retinit .ne. GASPI_SUCCESS) then
+         write(*,*) "gaspi_proc_init failed"
+         call exit(-1)
+      end if
+      retcommit = gaspi_group_commit(GASPI_GROUP_ALL, GASPI_BLOCK)
+
+      gpiiproc = gaspi_proc_rank(iproc)
+      gpinprocs = gaspi_proc_num(nprocs)
+c     write(*,900) 'rank = ',iproc
+c900  format(A,I)
+c     write(*,910) 'size = ', nprocs
+c910  format(A,I)
+c     =============================================================
 
 c     GET PLATFORM CHARACTERISTICS
 c     iverbose = 1
@@ -80,6 +100,12 @@ c     SET UP and RUN NEKBONE
 
 c     TEST BANDWIDTH BISECTION CAPACITY
 c     call xfer(np,cr_h)
+
+      retterm = gaspi_proc_term(GASPI_BLOCK)
+      if(retterm .ne. GASPI_SUCCESS) then
+         write(*,*) "gaspi_proc_term failed"
+         call exit(-1)
+      end if
 
       call exitt0
 
