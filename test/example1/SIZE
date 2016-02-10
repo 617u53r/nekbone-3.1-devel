@@ -3,7 +3,7 @@ C     Dimension file to be included
       parameter (ldim=3)                      ! dimension
       parameter (lx1=10,ly1=lx1,lz1=lx1)      ! polynomial order
 
-      parameter (lp = 10)                     ! max number of processors
+      parameter (lp = 100)                     ! max number of processors
       parameter (lelt=100)                    ! max number of elements, per proc
 
       parameter (lelg=lelt*lp)                ! max total elements in a test
