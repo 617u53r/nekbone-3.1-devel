@@ -22,11 +22,15 @@ c-----------------------------------------------------------------------
 
       ! check upper tag size limit
       call mpi_attr_get(MPI_COMM_WORLD,MPI_TAG_UB,nval,flag,ierr)
-      if (nval.lt.(10000+max(lp,lelg))) then
-         if(nid.eq.0) write(6,*) 'ABORT: MPI_TAG_UB too small!'
-         call exitt
+      if(nid.eq.0) then
+         write(*,*) 'MPI_TAG_UB ', nval
       endif
-
+c     test without MPI_TAG_UB
+c      if (nval.lt.(10000+max(lp,lelg))) then
+c         if(nid.eq.0) write(6,*) 'ABORT: MPI_TAG_UB too small!'
+c         call exitt
+c      endif
+c     test without MPI_TAG_UB
       IF (NP.GT.LP) THEN
          WRITE(6,*) 
      $   'ERROR: Code compiled for a max of',LP,' processors.'
@@ -74,8 +78,9 @@ c
          WRITE(6,*) 'REAL    wdsize      :',WDSIZE
          WRITE(6,*) 'INTEGER wdsize      :',ISIZE
       endif
-
-      call crystal_setup(cr_h,nekcomm,np)  ! set cr handle to new instance
+c     works without this func
+c     test for pure fortran
+c      call crystal_setup(cr_h,nekcomm,np)  ! set cr handle to new instance
 
       return
       end
@@ -1185,3 +1190,34 @@ c     Double Buffer : does 2*nloop timings
       end
 
 
+c-----------------------------------------------------------------------        
+      subroutine my_mpi_send(buf_send,len,dest,tag)
+      include 'mpif.h'
+
+      common /nekmpi/ nid_,np_,nekcomm,nekgroup,nekreal
+
+      real*4 buf_send(1)
+
+c      write(*,*) 'my_mpi_send'                                                 
+
+c      call adelay                                                              
+      call mpi_send(buf_send,len,mpi_byte,dest,tag,nekcomm,ierr)
+
+      return
+      end
+c-----------------------------------------------------------------------        
+      subroutine my_mpi_recv(buf_recv,len,src,tag)
+      include 'mpif.h'
+
+      common /nekmpi/ nid_,np_,nekcomm,nekgroup,nekreal
+
+      real*4 buf_recv(1)
+c      write(*,*) 'my_mpi_recv'                                                 
+
+c      call adelay                                                              
+
+      call mpi_recv(buf_recv,len,mpi_byte,src,tag,nekcomm,status,ierr)
+
+      return
+      end
+c-----------------------------------------------------------------------        

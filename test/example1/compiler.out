@@ -1,0 +1,155 @@
+ftn -c   -O3 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/cg.f -o obj/cg.o
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/driver.f -o obj/driver.o
+ftn -c  -O3 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/math.f -o obj/math.o
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/mxm_wrapper.f -o obj/mxm_wrapper.o 
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/prox_dssum.f -o obj/prox_dssum.o
+ftn -c  -O3 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/prox_setup.f -o obj/prox_setup.o
+ftn -c  -O3 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/semhat.f -o obj/semhat.o
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/speclib.f -o obj/speclib.o
+ftn -c -eo  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ -O scalar0 /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/syncgsop.f -o obj/syncgsop.o
+ftn-1192 crayftn: WARNING in command line
+  The "-Oscalar0" option conflicts with the "omp" option.  The "omp" option is ignored.
+ftn-1068 crayftn: WARNING in command line
+  Optimization level "scalar0" is specified.  This causes the optimization "thread2" to be reset to "thread0".
+ftn-1068 crayftn: WARNING in command line
+  Optimization level "scalar0" is specified.  This causes the optimization "vector2" to be reset to "vector0".
+Options: -O cache2,fp2,scalar0,thread0,vector0,mpi0,modinline,ipa3,noaggress
+       : -O autoprefetch,noautothread,fusion0,nomsgs,nonegmsgs,nooverindex
+       : -O nopattern,shortcircuit2,unroll0,nozeroinc
+       : -h noadd_paren,align_arrays,caf,noconcurrent,nocontiguous,nofp_trap
+       : -h nofunc_trace,nomessage,noomp_analyze,noomp_trace,nopat_trace
+       : -h safe_addr
+       : -h noomp,noacc
+       : -h flex_mp=default
+       : -h cpu=x86-64,haswell,aries
+       : -K trap=none
+       : -s real64 -eh
+       : -d acdgjnpvBDEIPQRS0
+       : -e moqswACFTZ
+       : -J bj
+       : -R c
+ftn -c -eo  -O3 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./  /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/facespacksum.f -o obj/facespacksum.o
+Options: -O cache2,fp2,scalar3,thread2,vector3,mpi0,modinline,ipa3,noaggress
+       : -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+       : -O pattern,shortcircuit2,unroll2,nozeroinc
+       : -h noadd_paren,align_arrays,caf,noconcurrent,nocontiguous,nofp_trap
+       : -h nofunc_trace,nomessage,noomp_analyze,noomp_trace,nopat_trace
+       : -h safe_addr
+       : -h omp,noacc
+       : -h flex_mp=default
+       : -h cpu=x86-64,haswell,aries
+       : -K trap=none
+       : -s real64 -eh
+       : -d acdgjnpvBDEIPQRS0
+       : -e moqswACFTZ
+       : -J bj
+       : -R c
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/delay_dum.f -o obj/delay_dum.o
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/hsmg_dum.f -o obj/hsmg_dum.o
+ftn -c  -O2 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f -o obj/comm_mpi.o
+ftn -c  -O3 -s real64 -eZ -em -Rc  -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/mxm_std.f -o obj/mxm_std.o
+ftn -c  -O0       -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/test/example1 -I/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src -I./ /afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/blas.f -o obj/blas.o
+
+
+ftn-7212 crayftn: WARNING EXITT, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 498 
+  Variable "istep" is used before it is defined.
+
+
+ftn-7212 crayftn: WARNING EXITT, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 499 
+  Variable "papi_flops" is used before it is defined.
+
+
+ftn-1279 crayftn: WARNING PINGPONGO, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 706, Column = 32 
+  Procedure "IRECV" is defined at line 343 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "X".
+
+
+ftn-1279 crayftn: WARNING PINGPONGO, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 707, Column = 30 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING PINGPONGO, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 734, Column = 30 
+  Procedure "CRECV" is defined at line 197 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING PINGPONGO, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 735, Column = 30 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1615 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 777, Column = 16 
+  Procedure "GOP" is defined at line 100 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  Dummy argument "X" is an array argument.  This argument is scalar.
+
+
+ftn-1615 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 777, Column = 21 
+  Procedure "GOP" is defined at line 100 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  Dummy argument "W" is an array argument.  This argument is scalar.
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 782, Column = 25 
+  Procedure "IRECV" is defined at line 343 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "X".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 783, Column = 23 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 788, Column = 28 
+  Procedure "IRECV" is defined at line 343 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "X".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 789, Column = 26 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 798, Column = 23 
+  Procedure "CRECV" is defined at line 197 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 799, Column = 23 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 803, Column = 26 
+  Procedure "CRECV" is defined at line 197 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 804, Column = 26 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1615 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 812, Column = 16 
+  Procedure "GOP" is defined at line 100 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  Dummy argument "X" is an array argument.  This argument is scalar.
+
+
+ftn-1615 crayftn: WARNING GET_MSG_VOL, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 812, Column = 21 
+  Procedure "GOP" is defined at line 100 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  Dummy argument "W" is an array argument.  This argument is scalar.
+
+
+ftn-1279 crayftn: WARNING GP2, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 999, Column = 29 
+  Procedure "CRECV" is defined at line 197 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GP2, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 1021, Column = 39 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GP2, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 1032, Column = 23 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "MTYPE".
+
+
+ftn-1279 crayftn: WARNING GP2, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 1032, Column = 29 
+  Procedure "CSEND" is defined at line 187 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+
+ftn-1279 crayftn: WARNING GP2, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 1034, Column = 23 
+  Procedure "CRECV" is defined at line 197 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "MTYPE".
+
+
+ftn-1279 crayftn: WARNING GP2, File = ../../../afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f, Line = 1034, Column = 29 
+  Procedure "CRECV" is defined at line 197 (/afs/pdc.kth.se/home/i/ilyai/Private/DANA/mpinekbl/src/comm_mpi.f).  The type of this argument does not agree with dummy argument "BUF".
+
+ftn -o nekbone  obj/cg.o obj/driver.o obj/math.o obj/mxm_wrapper.o obj/prox_dssum.o obj/prox_setup.o obj/semhat.o obj/speclib.o obj/syncgsop.o obj/facespacksum.o obj/delay_dum.o obj/hsmg_dum.o obj/comm_mpi.o obj/mxm_std.o obj/blas.o 
+#############################################################
+#                  Compilation successful!                  #
+#############################################################
+   text	   data	    bss	    dec	    hex	filename
+5924260	 353776	483547568	489825604	1d322544	nekbone
+

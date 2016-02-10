@@ -611,7 +611,9 @@ C
       do 10 i=1,n
          tmp = tmp + a(i)*b(i)*mult(i)
  10   continue
+      call mytimer(0)
       call gop(tmp,work,'+  ',1)
+      call mytimer(1)
       glsc3 = tmp
       return
       end
@@ -1100,7 +1102,7 @@ C
 C     Use Heap Sort (p 231 Num. Rec., 1st Ed.)
 C
       real a(1),aa
-      integer ind(1)
+      real ind(1)
  
       dO 10 j=1,n
          ind(j)=j

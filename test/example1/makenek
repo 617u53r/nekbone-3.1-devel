@@ -30,10 +30,16 @@ CC="cc"
 
 # linking flags
 #USR_LFLAGS="-L/usr/lib -lfoo"
-
+#USR_LFLAGS="-L$HOME/mylib/EMPI4Re/lib -lmpi"
+#USR_LFLAGS="-L$HOME/mylib/EMPI4Re/lib -I$HOME/mylib/EMPI4Re/include -lmpi"
+#-L/path/to/ipm/lib -lipm
+#USR_LFLAGS="-L/afs/pdc.kth.se/home/i/ilyai/libs/ipm/lib -lipm -lmpi" 
+#USR_LFLAGS="-L/afs/pdc.kth.se/home/i/ilyai/libs/mpip/lib -lmpiP -lbfd"
 # generic compiler flags
-#G="-g"
-
+#G="-h omp"
+#G="-L$HOME/mylib/EMPI4Re/lib -I$HOME/mylib/EMPI4Re/include -lmpi"
+# show witch O flads uses
+#G="-eo"
 # optimization flags
 #OPT_FLAGS_STD=""
 #OPT_FLAGS_MAG=""

@@ -18,8 +18,8 @@ c-----------------------------------------------------------------------
 
       call setup_g(g)
      
-c     m = nx1*ny1*nz1*nelt
-c     call outmat(g,6,m,'gxyz 1',m)
+      m = nx1*ny1*nz1*nelt
+c      call outmat(g,6,m,'gxyz 1',m)
 
       return
       end
