@@ -30,6 +30,7 @@ CC="cc"
 
 # linking flags
 #USR_LFLAGS="-L/usr/lib -lfoo"
+#USR_LFLAGS="-L/afs/pdc.kth.se/home/d/danaak/Public/ipm/lib -lipm"
 
 # generic compiler flags
 #G="-g"

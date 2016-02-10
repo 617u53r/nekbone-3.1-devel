@@ -92,6 +92,39 @@ c
       return
       end
 c-----------------------------------------------------------------------
+      subroutine nonblockgop( x, w, op, n)
+c
+c     Global vector commutative operation
+c
+      include 'mpif.h'
+      common /nekmpi/ nid,np,nekcomm,nekgroup,nekreal
+c
+      real x(n), w(n)
+      character*3 op
+c
+      call adelay
+      if (op.eq.'+  ') then
+         call mpi_iallreduce(x,w,n,nekreal,mpi_sum,nekcomm,imsg,ierr)
+         call mpi_wait(imsg,status,ierr)
+      elseif (op.EQ.'M  ') then
+         call mpi_iallreduce (x,w,n,nekreal,mpi_max,nekcomm,imsg,ierr)
+         call mpi_wait(imsg,status,ierr)
+      elseif (op.EQ.'m  ') then
+         call mpi_iallreduce (x,w,n,nekreal,mpi_min,nekcomm,imsg,ierr)
+         call mpi_wait(imsg,status,ierr)
+      elseif (op.EQ.'*  ') then
+         call mpi_iallreduce (x,w,n,nekreal,mpi_prod,nekcomm,imsg,ierr)
+         call mpi_wait(imsg,status,ierr)
+      else
+         write(6,*) nid,' OP ',op,' not supported.  ABORT in GOP.'
+         call exitt
+      endif
+
+      call copy(x,w,n)
+
+      return
+      end
+c-----------------------------------------------------------------------
       subroutine gop( x, w, op, n)
 c
 c     Global vector commutative operation

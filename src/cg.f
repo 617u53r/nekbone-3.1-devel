@@ -22,10 +22,11 @@ c
       real ur(lt),us(lt),ut(lt),wk(lt)
 
       real x(n),f(n),r(n),w(n),p(n),z(n),g(1),c(n)
-
+      real time_sum, t0
       character*1 ans
 
       pap = 0.0
+      time_sum = 0.0
 
 c     set machine tolerances
       one = 1.
@@ -39,7 +40,14 @@ c     set machine tolerances
       call copy (r,f,n)
       call maskit (r,cmask,nx1,ny1,nz1) ! Zero out Dirichlet conditions
 
-      rnorm = sqrt(glsc3(r,c,r,n))
+c     a=mpi_wtime()
+      rnorm_rnorm = glsc3(r,c,r,n)
+c     b=mpi_wtime()
+c     a=b-a
+c     if (nid.eq.0)  write(6,6) a
+
+      rnorm=sqrt(rnorm_rnorm)
+
       iter = 0
       if (nid.eq.0)  write(6,6) iter,rnorm
 
@@ -49,21 +57,28 @@ c     call tester(z,r,n)
          call solveM(z,r,n)    ! preconditioner here
 
          rtz2=rtz1                                                       ! OPS
+         t0 = mpi_wtime()
          rtz1=glsc3(r,c,z,n)   ! parallel weighted inner product r^T C z ! 3n
+         time_sum = time_sum + (mpi_wtime() - t0)
 
          beta = rtz1/rtz2
          if (iter.eq.1) beta=0.0
          call add2s1(p,z,beta,n)                                         ! 2n
 
          call ax(w,p,g,ur,us,ut,wk,n)                                    ! flopa
+         t0 = mpi_wtime()
          pap=glsc3(w,c,p,n)                                              ! 3n
+         time_sum = time_sum + (mpi_wtime() - t0)
 
          alpha=rtz1/pap
          alphm=-alpha
          call add2s2(x,p,alpha,n)                                        ! 2n
          call add2s2(r,w,alphm,n)                                        ! 2n
 
+         t0 = mpi_wtime()
          rtr = glsc3(r,c,r,n)                                            ! 3n
+         time_sum = time_sum + (mpi_wtime() - t0)
+
          if (iter.eq.1) rlim2 = rtr*eps**2
          if (iter.eq.1) rtr0  = rtr
          rnorm = sqrt(rtr)
@@ -75,6 +90,9 @@ c        if (rtr.le.rlim2) goto 1001
       enddo
 
  1001 continue
+
+      time_sum = time_sum/(3.0*miter)
+      if(nid.eq.0) write(6,6) time_sum
 
       if (nid.eq.0) write(6,6) iter,rnorm,alpha,beta,pap
 

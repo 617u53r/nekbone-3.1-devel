@@ -164,7 +164,8 @@ case $F77comp in
                PPPO="-WF,"
                F77="${F77} -qsuppress=cmpmsg"
                ;;
-  *ftn*)        P="-r8 -Mpreprocess"
+  *ftn*)        P="-s real64 -eZ -F"
+#  *ftn*)        P="-r8 -Mpreprocess"
                ;;
   *sunf*)       P="-r8const -xtypemap=real:64 -fpp"
                ;;

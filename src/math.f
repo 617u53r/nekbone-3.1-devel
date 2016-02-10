@@ -611,7 +611,7 @@ C
       do 10 i=1,n
          tmp = tmp + a(i)*b(i)*mult(i)
  10   continue
-      call gop(tmp,work,'+  ',1)
+      call nonblockgop(tmp,work,'+  ',1)
       glsc3 = tmp
       return
       end
