@@ -3,8 +3,8 @@ C     Dimension file to be included
       parameter (ldim=3)                      ! dimension
       parameter (lx1=10,ly1=lx1,lz1=lx1)      ! polynomial order
 
-      parameter (lp = 100)                     ! max number of processors
-      parameter (lelt=100)                    ! max number of elements, per proc
+      parameter (lp = 33)                     ! max number of processors
+      parameter (lelt=1025)                    ! max number of elements, per proc
 
       parameter (lelg=lelt*lp)                ! max total elements in a test
 
@@ -13,4 +13,52 @@ C     Dimension file to be included
 
       common /dimn/ nelx,nely,nelz,nelt       ! local element common block
      $            , nx1,ny1,nz1,ndim,nfield,nid
-
+      common /gaspi_sync_faces/ face_right(ly1*lz1*lelt)
+     $       ,face_left(ly1*lz1*lelt)
+     $     ,face_y_top(lx1*lz1*lelt),face_y_bottom(lx1*lz1*lelt)
+     $     ,face_z_front(lx1*ly1*lelt),face_z_back(lx1*ly1*lelt)
+      integer*8 face_right(ly1*lz1*lelt)
+     $       ,face_left(ly1*lz1*lelt)
+     $     ,face_y_top(lx1*lz1*lelt),face_y_bottom(lx1*lz1*lelt)
+     $     ,face_z_front(lx1*ly1*lelt),face_z_back(lx1*ly1*lelt)
+      common /gaspi_sync_faces_local/ l_face_left(lx1*ly1*lz1)
+     $       ,l_face_right(lx1*ly1*lz1)
+     $     ,l_face_y_top(lx1*ly1*lz1),l_face_y_bottom(lx1*ly1*lz1)
+     $      ,l_face_z_front(lx1*ly1*lz1),l_face_z_back(lx1*ly1*lz1)
+      integer*8 l_face_left(lx1*ly1*lz1),l_face_right(lx1*ly1*lz1)
+     $     ,l_face_y_top(lx1*ly1*lz1),l_face_y_bottom(lx1*ly1*lz1)
+     $      ,l_face_z_front(lx1*ly1*lz1),l_face_z_back(lx1*ly1*lz1)
+      common /buf_msg_sync/  data_send_x_right(lx1*ly1*lz1*lelt)
+     $	     ,data_send_x_left(lx1*ly1*lz1*lelt)
+     $ 	     ,msg_x_from_left(lx1*ly1*lz1*lelt)
+     $	     ,msg_x_from_right(lx1*ly1*lz1*lelt)
+     $ 	     ,data_send_y_top(lx1*ly1*lz1*lelt)
+     $	     ,data_send_y_bottom(lx1*ly1*lz1*lelt)
+     $ 	     ,msg_y_from_top(lx1*ly1*lz1*lelt)
+     $	     ,msg_y_from_bottom(lx1*ly1*lz1*lelt)
+     $       ,data_send_z_front(lx1*ly1*lz1*lelt)
+     $       ,data_send_z_back(lx1*ly1*lz1*lelt)
+     $	     ,msg_z_from_front(lx1*ly1*lz1*lelt)
+     $	     ,msg_z_from_back(lx1*ly1*lz1*lelt)
+      real*8 data_send_x_right(lx1*ly1*lz1*lelt)
+     $       ,data_send_x_left(lx1*ly1*lz1*lelt)
+     $       ,msg_x_from_left(lx1*ly1*lz1*lelt)
+     $       ,msg_x_from_right(lx1*ly1*lz1*lelt)
+     $       ,data_send_y_top(lx1*ly1*lz1*lelt)
+     $       ,data_send_y_bottom(lx1*ly1*lz1*lelt)
+     $       ,msg_y_from_top(lx1*ly1*lz1*lelt)
+     $       ,msg_y_from_bottom(lx1*ly1*lz1*lelt)
+     $       ,data_send_z_front(lx1*ly1*lz1*lelt)
+     $       ,data_send_z_back(lx1*ly1*lz1*lelt)
+     $       ,msg_z_from_front(lx1*ly1*lz1*lelt)
+     $       ,msg_z_from_back(lx1*ly1*lz1*lelt)
+      common /gaspi_offset_faces/ offset_left,offset_right
+     $     ,offset_top,offset_bottom,offset_front,offset_back
+      integer offset_left,offset_right
+     $     ,offset_top,offset_bottom,offset_front,offset_back
+      common /gaspi_offset_faces_recv/ off_from_left
+     $       ,off_from_right
+     $     ,off_from_top,off_from_bottom,off_from_front
+     $     ,off_from_back
+      integer off_from_left,off_from_right,off_from_top
+     $     ,off_from_bottom,off_from_front,off_from_back

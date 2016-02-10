@@ -92,6 +92,7 @@ void fcrystal_setup(sint *handle, const MPI_Fint *comm, const sint *np)
     handle_array=trealloc(struct crystal*,handle_array,handle_max);
   handle_array[handle_n]=p=tmalloc(struct crystal,1);
   comm_init_check(&p->comm, *comm, *np);
+  //  printf("comm_init - fcrystal setup\n");
   buffer_init(&p->data,1000);
   buffer_init(&p->work,1000);
   *handle = handle_n++;

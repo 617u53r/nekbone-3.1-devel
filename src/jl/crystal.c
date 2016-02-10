@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------
   
-  Crystal Router
+  Crysta_ Router
   
   Accomplishes all-to-all communication in log P msgs per proc
   The routine is low-level; the format of the input/output is an
@@ -55,6 +55,7 @@ struct crystal {
 void crystal_init(struct crystal *p, const struct comm *comm)
 {
   comm_dup(&p->comm, comm);
+  //  printf("comm_dup - crystal_init\n");
   buffer_init(&p->data,1000);
   buffer_init(&p->work,1000);
 }

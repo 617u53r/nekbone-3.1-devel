@@ -1,5 +1,8 @@
 c-----------------------------------------------------------------------
-      subroutine cg(x,f,g,c,r,w,p,z,n,niter,flop_cg)
+      subroutine cg(x,f,g,c,r,w,p,z,n,niter,flop_cg,n_shared,
+     $     x_src,x_dest,y_src,y_dest,
+     $     z_src,z_dest,
+     $     npx,npy,npz,mx,my,mz)
       include 'SIZE'
 
 c     Solve Ax=f where A is SPD and is invoked by ax()
@@ -22,9 +25,15 @@ c
       real ur(lt),us(lt),ut(lt),wk(lt)
 
       real x(n),f(n),r(n),w(n),p(n),z(n),g(1),c(n)
-
+      integer count
+      integer npx,npy, npz, mx, my,mz
+      
+      integer n_shared
+      integer src,dest,ierr,status99
       character*1 ans
+      integer x_src,x_dest,y_src,y_dest,z_src,z_dest
 
+      
       pap = 0.0
 
 c     set machine tolerances
@@ -39,12 +48,13 @@ c     set machine tolerances
       call copy (r,f,n)
       call maskit (r,cmask,nx1,ny1,nz1) ! Zero out Dirichlet conditions
 
+c     Testing cmask
       rnorm = sqrt(glsc3(r,c,r,n))
       iter = 0
       if (nid.eq.0)  write(6,6) iter,rnorm
-
       miter = niter
 c     call tester(z,r,n)  
+      call mytimer(3)
       do iter=1,miter
          call solveM(z,r,n)    ! preconditioner here
 
@@ -55,7 +65,11 @@ c     call tester(z,r,n)
          if (iter.eq.1) beta=0.0
          call add2s1(p,z,beta,n)                                         ! 2n
 
-         call ax(w,p,g,ur,us,ut,wk,n)                                    ! flopa
+         call ax(w,p,g,ur,us,ut,wk,n,n_shared,
+     $        x_src,x_dest,y_src,y_dest,
+     $        z_src,z_dest,
+     $        npx,npy,npz,mx,my,mz)
+
          pap=glsc3(w,c,p,n)                                              ! 3n
 
          alpha=rtz1/pap
@@ -73,12 +87,41 @@ c    $      write(6,6) iter,rnorm,alpha,beta,pap
 c        if (rtr.le.rlim2) goto 1001
 
       enddo
-
+      call mytimer(2)
  1001 continue
 
       if (nid.eq.0) write(6,6) iter,rnorm,alpha,beta,pap
 
       flop_cg = flop_cg + iter*15.*n
+
+      return
+      end
+c-----------------------------------------------------------------------        
+      subroutine mytimer(flag)
+      include 'mpif.h'
+      include 'SIZE'
+      include 'TOTAL'
+      integer flag
+      real*8 time0,time1
+      real*8 tmp
+      save time0,time1,tmp
+      data time0/0.0/, time1/0.0/
+
+      if(flag.eq.0) then
+         tmp = mpi_wtime()
+      endif
+      if(flag.eq.1) then
+         time1 = time1+ mpi_wtime() - tmp
+      endif
+      if(flag.eq.2) then
+         if(nid.eq.0) then
+            write(*,'(A,e12.4)') 'comm time ', time1
+            write(777,'(A,1pe12.4)') 'comm time ',time1
+         endif
+      endif
+      if(flag.eq.3) then
+         time1 = 0.0
+      endif
 
       return
       end
@@ -93,28 +136,71 @@ c-----------------------------------------------------------------------
       return
       end
 c-----------------------------------------------------------------------
-      subroutine ax(w,u,gxyz,ur,us,ut,wk,n) ! Matrix-vector product: w=A*u
-
+      subroutine ax(w,u,gxyz,ur,us,ut,wk,n,n_shared,
+     $     x_src,x_dest,y_src,y_dest,
+     $     z_src,z_dest,
+     $     npx,npy,npz,mx,my,mz)
+      include 'mpif.h'
       include 'SIZE'
       include 'TOTAL'
-
+      include 'omp_lib.h'
+      integer n_shared
+c     number of processes per ox, oy axes, number elements per ox,oy 
+      integer npx,npy,npz,mx,my,mz
       real w(nx1*ny1*nz1,nelt),u(nx1*ny1*nz1,nelt)
       real gxyz(2*ldim,nx1*ny1*nz1,nelt)
 
       parameter (lt=lx1*ly1*lz1*lelt)
       real ur(lt),us(lt),ut(lt),wk(lt)
       common /mymask/cmask(-1:lx1*ly1*lz1*lelt)
-
+      common /nekmpi/ nid_,np_,nekcomm,nekgroup,nekreal
       integer e
 
+      integer src,dest,ierr1,status1,ierr2,status2
+      integer status
+      integer size
+      real sum
+      integer  e_x, e_y, e_z, e_right,e_left
+      integer e_top, e_bottom,e_back,e_front
+      integer i,j
+      real*8 time1,time2
+      
+      integer x_src,x_dest,y_src,y_dest,z_src,z_dest
 
+
+c     !$OMP PARALLEL DO PRIVATE(e,ur,us,ut,wk) SHARED(nelt,w,u,gxyz)  
+c     !$OMP& SCHEDULE(STATIC)        
       do e=1,nelt                                ! ~
          call ax_e( w(1,e),u(1,e),gxyz(1,1,e)    ! w   = A  u
      $                             ,ur,us,ut,wk) !  L     L  L
       enddo                                      ! 
+c     !$OMP END PARALLEL DO   
 
-      call dssum(w)         ! Gather-scatter operation  ! w   = QQ  w
+c      call rone(w,n)
+c      time1 = mpi_wtime()
+      call mytimer(0)
+      call sync_xyz(w,n_shared,
+     $     x_src,x_dest,y_src,y_dest,
+     $     z_src,z_dest,
+     $     npx,npy,npz,mx,my,mz)
+      call mytimer(1)
+c      time2 = mpi_wtime()-time1
+c      if(nid.eq.0) then
+c         write(*,'(A,e12.4)') 'time sync ', time2 
+c      endif
+
+c      call dssum(w)         ! Gather-scatter operation  ! w   = QQ  w
                                                            !            L
+c      sum = glsum(w,n)
+      
+c      write(*,'(A,e12.4)') 'glsum = ', sum 
+
+c      if(nid.eq.0) then 
+c         do i=1,n
+c            write(*,'(A,I3,A,e12.4)') 'w[ ',i,' ]= ', w(i,1)
+c         enddo
+c      endif
+
       call add2s2(w,u,.1,n)   !2n
       call maskit(w,cmask,nx1,ny1,nz1)  ! Zero out Dirichlet conditions
 
@@ -123,7 +209,7 @@ c-----------------------------------------------------------------------
 
       return
       end
-c-------------------------------------------------------------------------
+c------------------------------------------------------------------------- 
       subroutine ax1(w,u,n)
       include 'SIZE'
       real w(n),u(n)
@@ -283,21 +369,22 @@ c       write(6,*) x0,x1,y0,y1,z0,z1
       return
       end
 c-----------------------------------------------------------------------
-      subroutine tester(z,r,n)
+c     conflict if only fortran
+c      subroutine tester(z,r,n)
 c     Used to test if solution to precond. is SPD
-      real r(n),z(n)
-
-      do j=1,n
-         call rzero(r,n)
-         r(j) = 1.0
-         call solveM(z,r,n)
-         do i=1,n
-            write(79,*) z(i)
-         enddo
-      enddo
-      call exitt0
-      return
-      end
+c      real r(n),z(n)
+c
+c      do j=1,n
+c         call rzero(r,n)
+c         r(j) = 1.0
+c         call solveM(z,r,n)
+c         do i=1,n
+c            write(79,*) z(i)
+c         enddo
+c      enddo
+c      call exitt0
+c      return
+c      end
 c-----------------------------------------------------------------------
       subroutine get_face(w,nx,ie)
 c     zero out all boundaries as Dirichlet

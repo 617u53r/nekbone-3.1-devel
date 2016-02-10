@@ -63,6 +63,7 @@
 
 #ifdef MPI
 #include <mpi.h>
+#include <stdio.h>
 typedef MPI_Comm comm_ext;
 typedef MPI_Request comm_req;
 #else
@@ -166,6 +167,7 @@ static void comm_dup_(struct comm *d, const struct comm *s,
   d->id = s->id, d->np = s->np;
 #ifdef MPI
   MPI_Comm_dup(s->c,&d->c);
+  //  printf("comm_dup11111111111111111111111111111111111111111111n");
 #else
   if(s->np!=1) fail(1,file,line,"%s not compiled with -DMPI\n",file);
 #endif

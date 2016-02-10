@@ -19,6 +19,7 @@ GS_DEFINE_DOM_SIZES()
 static void scan_imp(void *scan, const struct comm *com, gs_dom dom, gs_op op,
                      const void *v, uint vn, void *buffer)
 {
+  // printf("scan_imp-----------------------------------");
   comm_req req[2];
   size_t vsize = vn*gs_dom_size[dom];
   const uint id=com->id, np=com->np;

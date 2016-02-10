@@ -22,6 +22,9 @@ c-----------------------------------------------------------------------
 
       ! check upper tag size limit
       call mpi_attr_get(MPI_COMM_WORLD,MPI_TAG_UB,nval,flag,ierr)
+      if(nid.eq.0) then
+         write(*,*) 'MPI_TAG_UB ', nval
+      endif
       if (nval.lt.(10000+max(lp,lelg))) then
          if(nid.eq.0) write(6,*) 'ABORT: MPI_TAG_UB too small!'
          call exitt
@@ -74,8 +77,9 @@ c
          WRITE(6,*) 'REAL    wdsize      :',WDSIZE
          WRITE(6,*) 'INTEGER wdsize      :',ISIZE
       endif
-
-      call crystal_setup(cr_h,nekcomm,np)  ! set cr handle to new instance
+c     works without this func
+c     test for pure fortran
+c      call crystal_setup(cr_h,nekcomm,np)  ! set cr handle to new instance
 
       return
       end
@@ -116,6 +120,36 @@ c
          call exitt
       endif
 
+      call copy(x,w,n)
+
+      return
+      end
+c-----------------------------------------------------------------------
+      subroutine gpi_gop(x,w,n)
+      use, intrinsic :: ISO_C_BINDING
+      use gaspi
+      
+      real x(n), w(n)
+      
+      integer(gaspi_return_t) :: ret
+      integer(gaspi_number_t) :: num
+      integer(gaspi_int)::op,datatype
+      type(c_ptr) :: cptr_x,cptr_w
+
+      cptr_x = c_loc(x(1))
+      cptr_w = c_loc(w(1))
+      num=n
+      op = GASPI_OP_SUM
+      datatype = GASPI_TYPE_DOUBLE
+c      datatype = 
+      call adelay
+      ret = gaspi_allreduce(cptr_x,cptr_w,num,op,
+     $     datatype,GASPI_GROUP_ALL,GASPI_BLOCK)
+      if(ret .ne. GASPI_SUCCESS) then
+         write(*,*) "gaspi_allreduce failed"
+         call exit(-1)
+      endif
+      
       call copy(x,w,n)
 
       return
@@ -1185,3 +1219,34 @@ c     Double Buffer : does 2*nloop timings
       end
 
 
+c-----------------------------------------------------------------------        
+      subroutine my_mpi_send(buf_send,len,dest,tag)
+      include 'mpif.h'
+
+      common /nekmpi/ nid_,np_,nekcomm,nekgroup,nekreal
+
+      real*4 buf_send(1)
+
+c      write(*,*) 'my_mpi_send'                                                 
+
+c      call adelay                                                              
+      call mpi_send(buf_send,len,mpi_byte,dest,tag,nekcomm,ierr)
+
+      return
+      end
+c-----------------------------------------------------------------------        
+      subroutine my_mpi_recv(buf_recv,len,src,tag)
+      include 'mpif.h'
+
+      common /nekmpi/ nid_,np_,nekcomm,nekgroup,nekreal
+
+      real*4 buf_recv(1)
+c      write(*,*) 'my_mpi_recv'                                                 
+
+c      call adelay                                                              
+
+      call mpi_recv(buf_recv,len,mpi_byte,src,tag,nekcomm,status,ierr)
+
+      return
+      end
+c-----------------------------------------------------------------------        

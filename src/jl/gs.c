@@ -1105,6 +1105,7 @@ struct gs_data *gs_setup(const slong *id, uint n, const struct comm *comm,
 {
   struct gs_data *gsh = tmalloc(struct gs_data,1);
   comm_dup(&gsh->comm,comm);
+  printf("comm_dup - gs_setup\n");
   gs_setup_aux(gsh,id,n,unique,method,verbose);
   return gsh;
 }

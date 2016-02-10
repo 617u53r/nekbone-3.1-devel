@@ -154,7 +154,7 @@ fi
 case $F77comp in
   *pgf*)        P="-r8 -Mpreprocess"
                ;;
-  *gfortran*)   P="-fdefault-real-8 -x f77-cpp-input"
+  *gfortran*)   P="-fdefault-real-8 -x f77-cpp-input -w"
                ;;
   *ifort*)      P="-r8 -fpconstant -fpp"
                ;;
@@ -164,7 +164,11 @@ case $F77comp in
                PPPO="-WF,"
                F77="${F77} -qsuppress=cmpmsg"
                ;;
-  *ftn*)        P="-r8 -Mpreprocess"
+#  *ftn*)        P="-r8 -Mpreprocess"
+# cray
+  *ftn*)        P="-s real64 -eZ -em -Rc"	 
+#  intel compiler ifort
+#  *ftn*)        P="-r8 -fpconstant -fpp"
                ;;
   *sunf*)       P="-r8const -xtypemap=real:64 -fpp"
                ;;

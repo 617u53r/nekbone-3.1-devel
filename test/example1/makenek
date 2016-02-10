@@ -30,10 +30,14 @@ CC="cc"
 
 # linking flags
 #USR_LFLAGS="-L/usr/lib -lfoo"
-
+USR_LFLAGS="$HOME/GPI2/include/GASPI.f90 -L$HOME/GPI2/lib64 -lpmi -lugni -lrca \
+-lGPI2"
 # generic compiler flags
+#G="-h omp"
 #G="-g"
-
+# show witch O flads uses
+#G="-eo"
+G="-I$HOME/GPI2/include"
 # optimization flags
 #OPT_FLAGS_STD=""
 #OPT_FLAGS_MAG=""
