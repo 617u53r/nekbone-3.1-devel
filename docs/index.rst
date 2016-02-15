@@ -10,35 +10,35 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   1 Introduction to Nekbone 3
-   2 Getting Started 4
-   2.1  Setup . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
-   2.2 Running A First Example . . . . . . . . . . . . . . . 4
-   3 Parameters in Nekbone 6
-   3.1 SIZE File . . . . . . . . . . . . . . . . . . . . . . . . 6
-   3.1.1 Impact of Parameters . . . . . . . . . . . . . . 7
-   3.2 data.rea File . . . . . . . . . . . . . . . . . . . . . . . 7
-   4 The Nekbone Code: Default Scheme 10
-   4.1 The Default Setup . . . . . . . . . . . . . . . . . . . 10
-   5 Details on Running and Editing Nekbone Examples 13
-   5.1 Editing the Nekbone Test Examples . . . . . . . . . . 13
-   5.2 Compiling Nekbone . . . . . . . . . . . . . . . . . . . 14
-   5.3 Understanding the Output . . . . . . . . . . . . . . . 16
-   5.3.1 Element and Processor Distribution . . . . . . 16
-   5.3.2 Platform timer Results . . . . . . . . . . . . . 16
-   5.3.3 Conjugate Gradient & Flop Counts . . . . . . 17
-    5.3.4 Bandwidth Test . . . . . . . . . . . . . . . . . 18
-    6 Overview of Included Nekbone Examples 19
-    6.1 The basic nekbone example, A template . . . . . . . 19
-    6.2 The simplest example, example2 . . . . . . . . . . . . 19
-    6.3 The more complex example, example3 . . . . . . . . 19
-    6.4 The Multigrid Preconditioner Example . . . . . . . . 20
-    6.5 Special Platform Performance Example, nek comm . 20
-    6.6 Load Imbalance Example, nekdlay . . . . . . . . . . . 20
-    7 Nekbone & Nek5000 22
-    7.1 How Nekbone Represents Nek5000 . . . . . . . . . . 22
-    7.2 MPI Communication within Nekbone . . . . . . . . . 22
-    7.3 Optimization Opportunities . . . . . . . . . . . . . . 23
+   Introduction to Nekbone
+   Getting Started
+   Setup
+   Running A First Example
+   Parameters in Nekbone
+   SIZE File
+   Impact of Parameters
+   data.rea File
+   The Nekbone Code: Default Scheme
+   The Default Setup
+   Details on Running and Editing Nekbone Examples
+   Editing the Nekbone Test Examples
+   Compiling Nekbone
+   Understanding the Output
+   Element and Processor Distribution
+   Platform timer Results
+   Conjugate Gradient & Flop Counts
+   Bandwidth Test
+   Overview of Included Nekbone Examples
+   The basic nekbone example, A template
+   The simplest example, example2
+   The more complex example, example3
+   The Multigrid Preconditioner Example
+   Special Platform Performance Example, nek comm
+   Load Imbalance Example, nekdlay
+   Nekbone & Nek5000
+   How Nekbone Represents Nek5000
+   MPI Communication within Nekbone
+   Optimization Opportunities
 
 Indices and tables
 ==================
